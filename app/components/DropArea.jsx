@@ -3,19 +3,22 @@
 // 2016-18 Claus Zinn, University of Tuebingen
 // 
 // File: DropArea.jsx
-// Time-stamp: <2019-02-28 16:32:52 (zinn)>
+// Time-stamp: <2019-03-19 15:51:00 (zinn)>
 // -------------------------------------------
 
 import React from 'react';
 import Loader from 'react-loader';
 import Dropzone from 'react-dropzone';
 import TextareaAutosize from 'react-autosize-textarea';
+import ReactTooltip from 'react-tooltip';
+
 import AlertURLFetchError from './AlertURLFetchError.jsx';
 import AlertURLIncorrectError from './AlertURLIncorrectError.jsx';
 import AlertURLUploadError from './AlertURLUploadError.jsx';
 import AlertShibboleth from './AlertShibboleth.jsx';
 import AlertMissingInfo from './AlertMissingInfo.jsx';
 import AlertMissingInputText from './AlertMissingInputText.jsx'; 
+import UserFAQ from './UserFAQ.jsx';                // component displaying user faq
 
 import MatcherRemote from '../back-end/MatcherRemote';
 import Profiler from '../back-end/Profiler';
@@ -40,10 +43,12 @@ export default class DropArea extends React.Component {
 	console.log('DropArea', props);
 	this.onDrop      = this.onDrop.bind(this);
 	this.getPermissableMimetypes = this.getPermissableMimetypes.bind(this);
+	this.getPermissableLanguages = this.getPermissableLanguages.bind(this);	
 	
 	this.state = {
 	    isLoaded: true,
 	    mimetypes : [],
+	    languages : [],	    
 	    
 	    textInputValue: "",
 	    urlInputValue: "",
@@ -81,6 +86,9 @@ export default class DropArea extends React.Component {
 
 	// set state for permissable mediatypes
 	this.getPermissableMimetypes();
+
+	// set state for permissable languages
+	this.getPermissableLanguages();
     }
 
     processParameters( caller, parameters ) {
@@ -127,9 +135,6 @@ export default class DropArea extends React.Component {
 	    // clear task-oriented view
 	    this.clearDropzone();
 
-	    // reset textarea for textual input	    
-	    this.setState({ textInputValue : "" });
-
 	    _paq.push(["trackEvent", 'textInput', textContent, textContent.length]);
 	}
 
@@ -139,6 +144,12 @@ export default class DropArea extends React.Component {
     clearDropzone() {
 	console.log('DropArea/clearDropzone', this.state);
 
+	// reset textarea for url input	    
+	this.setState({ urlInputValue : "" });
+
+	// reset textarea for textual input	    
+	this.setState({ textInputValue : "" });
+	
 	// signal to parent that tool list is empty
 	this.handleToolsChange( [] );
 	
@@ -161,9 +172,6 @@ export default class DropArea extends React.Component {
 	    this.clearDropzone();
 	    
 	    this.downloadAndProcessSharedLink( link );
-
-	    // reset textarea for url input	    
-	    this.setState({ urlInputValue : "" });
 	    
 	    event.target.value = "";
 
@@ -262,25 +270,35 @@ export default class DropArea extends React.Component {
 		console.log('DropArea.jsx/getPermissableMimetypes failed', reject);
 	    });	
     }
+
+    getPermissableLanguages() {
+	const matcher = new MatcherRemote( true ); 
+	const languagePromise = matcher.getSupportedLanguages();
+	const that = this;
+
+	languagePromise.then(
+	    function(resolve) {
+		console.log('DropArea.jsx/getPermissableLanguages succeeded', resolve);		
+		that.setState( {languages: resolve} );		
+	    },
+	    function(reject) {
+		console.log('DropArea.jsx/getPermissableLanguages failed', reject);
+	    });	
+    }    
     
     // for time being, only single file is accepted (multiple=false)
     onDrop(acceptedFiles, rejectedFiles) {
-	console.log('DropArea/onDrop', files);
+	console.log('DropArea/onDrop', acceptedFiles, rejectedFiles);
 
 	// deal with rejected files
 	if (rejectedFiles.length) {
 	    console.log("A file was rejected", rejectedFiles.length, rejectedFiles[0].name)
+	    this.setState( {showAlertURLUploadError: true} );	
 	    _paq.push(["trackEvent", 'fileInputRejected', rejectedFiles[0].name]);
-            // todo: show message that some files were rejected
+        // todo: show more proper message to users that some files were rejected
 	    return;
 	}
 	
-	// clear resources view
-	if (acceptedFiles.length > 0) {
-	    ResourceActions.reset();
-	}	
-
->>>>>>> master
 	// clear dropzone and hence its task-oriented view
 	this.clearDropzone();
 	
@@ -342,7 +360,13 @@ export default class DropArea extends React.Component {
 
 	return (
 	      <div>
- 	        <h3 id="dropAreaHeading">Provision of Input</h3>
+ 	        <h3 id="dropAreaHeading">Input</h3>
+                <div className="dropAreaTable">
+		  <p>The Switchboard helps you find tools that can process your resources. Use one of the three boxes below to upload your data.
+		    <br />Your data will be shared with the tools via public links. For more details, see the {' '}
+   		    <UserFAQ className="header-link" />.
+                   </p>
+		</div>		
 		<Loader loaded={this.state.isLoaded} />
 		<table className="dropAreaTable">
 		  <tbody>
