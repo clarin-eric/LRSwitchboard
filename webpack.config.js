@@ -130,7 +130,7 @@ const common = {
 		'FILE_STORAGE_TOKEN'    : JSON.stringify(process.env.FILE_STORAGE_TOKEN),
 
 		// version as displayed on the main page
-		'VERSION'            : JSON.stringify('v1.4.9 (Mar 19, 2019)'),
+		'VERSION'            : JSON.stringify('v1.4.9 (Mar 21, 2019)'),
 
 		// contact as displayed of the main page
 		'CONTACT'            : JSON.stringify('switchboard@clarin.eu')
