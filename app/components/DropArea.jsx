@@ -3,7 +3,7 @@
 // 2016-18 Claus Zinn, University of Tuebingen
 // 
 // File: DropArea.jsx
-// Time-stamp: <2019-03-19 15:51:00 (zinn)>
+// Time-stamp: <2019-04-02 16:02:30 (zinn)>
 // -------------------------------------------
 
 import React from 'react';
@@ -78,6 +78,8 @@ export default class DropArea extends React.Component {
 
     componentDidMount() {
 
+	_paq.push(["trackEvent", 'enterSwitchboard', this.props.caller]); 	    		
+	
 	// fetch all parameter from router
 	const parameters = this.props.match.params;
 
@@ -310,14 +312,12 @@ export default class DropArea extends React.Component {
 	_paq.push(["trackEvent", 'fileInput', acceptedFiles[0].name]);
     }
 
-    
     render() {
 
 	// when invoked via VLO/B2DROP/D4Science/etc, we add transferal info to the middle box
 	const transferalInfo = `Resource transferal from ${this.props.caller}. Please check the information below, then press "Show Tools"`;
 	
 	console.log('DropArea/render', this.state.isLoaded, this.props.caller);
-	_paq.push(["trackEvent", 'enterSwitchboard', this.props.caller]); 	    		
 	
         const styleDropzone = {
             borderWidth: 2,
@@ -356,8 +356,6 @@ export default class DropArea extends React.Component {
         };
 
 	const permissableMimetypes = [...this.state.mimetypes].toString();
-	console.log('Permissable mimetypes', permissableMimetypes);
-
 	return (
 	      <div>
  	        <h3 id="dropAreaHeading">Input</h3>
