@@ -65,7 +65,7 @@
     "lodash": "^4.17.11",
     "node-uuid": "^1.4.7",
     "piwik-react-router": "^0.12.1",
-    "popper.js": "^1.14.6",
+    "popper.js": "^1.14.7",
     "prop-types": "^15.6.2",
     "react": "^15.6.2",
     "react-accessible-accordion": "^2.4.5",
